@@ -1,5 +1,5 @@
 
-import { Fragment, useId } from "react";
+import { Fragment, useId, useState } from "react";
 import { SkillBadge } from "./SkillBadge";
 import styles from "./DeveloperCard.module.css";
 
@@ -17,17 +17,48 @@ export function DeveloperCard({
   skills = [],
 }) {
   const headingId = useId();
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState(null);
+
+  const initials = fullName
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+
+  const validAvatarUrl =
+    typeof avatarUrl === "string" &&
+    avatarUrl.startsWith("https://");
+
+  const showAvatar =
+    validAvatarUrl && failedAvatarUrl !== avatarUrl;
 
   return (
-    <article className={styles.card} aria-labelledby={headingId}>
+    <article
+      className={styles.card}
+      aria-labelledby={headingId}
+    >
       <header className={styles.header}>
-        <img
-          className={styles.avatar}
-          src={avatarUrl}
-          alt={`Portrait of ${fullName}`}
-          width={80}
-          height={80}
-        />
+        {showAvatar ? (
+          <img
+            key={avatarUrl}
+            className={styles.avatar}
+            src={avatarUrl}
+            alt={`Portrait of ${fullName}`}
+            width={80}
+            height={80}
+            onError={() => setFailedAvatarUrl(avatarUrl)}
+          />
+        ) : (
+          <span
+            className={styles.avatarFallback}
+            role="img"
+            aria-label={`Avatar initials for ${fullName}`}
+          >
+            {initials || "?"}
+          </span>
+        )}
 
         <hgroup className={styles.identity}>
           <h2 id={headingId}>{fullName}</h2>
@@ -46,7 +77,9 @@ export function DeveloperCard({
             <Fragment key={key}>
               <dt>{metricLabels[key] ?? key}</dt>
               <dd>
-                {key === "a11yScore" ? `${value}/100` : value}
+                {key === "a11yScore"
+                  ? `${value}/100`
+                  : value}
               </dd>
             </Fragment>
           ))}
