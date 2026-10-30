@@ -151,6 +151,14 @@ Acceptance Criteria:
 - Correct heading hierarchy.
 - Props are rendered correctly.
 
+Verification:
+- DeveloperCard renders fullName, role and avatarUrl.
+- Semantic article and header elements are used.
+- hgroup contains developer heading and role.
+- useId provides an accessible heading reference.
+- Zero div elements in DeveloperCard.jsx.
+- npm run lint: PASS.
+- npm run build: PASS.
 Commit: `feat(ex1): implement semantic DeveloperCard structure`
 
 #### EX1-T07 – Render Metrics and Skills

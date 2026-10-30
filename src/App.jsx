@@ -1,23 +1,17 @@
 
-import { SkillBadge } from "./components/SkillBadge";
+import { DeveloperCard } from "./components/DeveloperCard";
 import { developerProfile } from "./data/developer";
 
 function App() {
   return (
     <main>
       <h1>Lab 03 – Exercise 1</h1>
-      <h2>SkillBadge Component Preview</h2>
 
-      <ul aria-label="Developer skills">
-        {developerProfile.skills.map((skill) => (
-          <li key={skill.id}>
-            <SkillBadge
-              name={skill.name}
-              tier={skill.tier}
-            />
-          </li>
-        ))}
-      </ul>
+      <DeveloperCard
+        fullName={developerProfile.fullName}
+        role={developerProfile.role}
+        avatarUrl={developerProfile.avatarUrl}
+      />
     </main>
   );
 }
