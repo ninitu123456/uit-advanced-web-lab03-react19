@@ -1,11 +1,11 @@
-
+import styles from "./SkillBadge.module.css";
 export function SkillBadge({
   name = "Unknown Skill",
   tier = "Unspecified",
 }) {
   return (
     <span
-      className="skill-badge"
+      className={styles.badge}
       data-tier={tier.toLowerCase()}
     >
       <strong>{name}</strong>

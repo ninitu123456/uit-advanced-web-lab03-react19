@@ -1,5 +1,7 @@
+
 import { Fragment, useId } from "react";
 import { SkillBadge } from "./SkillBadge";
+import styles from "./DeveloperCard.module.css";
 
 const metricLabels = {
   commits: "Total Commits",
@@ -17,38 +19,53 @@ export function DeveloperCard({
   const headingId = useId();
 
   return (
-    <article aria-labelledby={headingId}>
-      <header>
+    <article className={styles.card} aria-labelledby={headingId}>
+      <header className={styles.header}>
         <img
+          className={styles.avatar}
           src={avatarUrl}
           alt={`Portrait of ${fullName}`}
           width={80}
           height={80}
         />
-        <hgroup>
+
+        <hgroup className={styles.identity}>
           <h2 id={headingId}>{fullName}</h2>
           <p>{role}</p>
         </hgroup>
       </header>
 
-      <section aria-label="Developer performance metrics">
+      <section
+        className={styles.section}
+        aria-label="Developer performance metrics"
+      >
         <h3>Performance Metrics</h3>
-        <dl>
+
+        <dl className={styles.metrics}>
           {Object.entries(metrics).map(([key, value]) => (
             <Fragment key={key}>
               <dt>{metricLabels[key] ?? key}</dt>
-              <dd>{key === "a11yScore" ? `${value}/100` : value}</dd>
+              <dd>
+                {key === "a11yScore" ? `${value}/100` : value}
+              </dd>
             </Fragment>
           ))}
         </dl>
       </section>
 
-      <section aria-label="Developer technical skills">
+      <section
+        className={styles.section}
+        aria-label="Developer technical skills"
+      >
         <h3>Technical Skills</h3>
-        <ul>
+
+        <ul className={styles.skills}>
           {skills.map((skill) => (
             <li key={skill.id}>
-              <SkillBadge name={skill.name} tier={skill.tier} />
+              <SkillBadge
+                name={skill.name}
+                tier={skill.tier}
+              />
             </li>
           ))}
         </ul>
