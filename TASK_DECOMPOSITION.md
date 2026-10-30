@@ -113,6 +113,11 @@ Acceptance Criteria:
 - Every skill has a unique stable ID.
 - No UI code is mixed into the dataset.
 
+Verification:
+- Dataset imported successfully with Node.js.
+- All skill IDs are unique.
+- npm run lint: PASS.
+- npm run build: PASS.
 Commit: `feat(ex1): define developer profile dataset and skill schema`
 
 #### EX1-T05 – Implement SkillBadge
@@ -215,10 +220,10 @@ For each implementation task:
 
 ### 6. Completion Checklist
 
-- [ ] React 19 and Vite initialized
-- [ ] Project rules documented
-- [ ] Task decomposition completed
-- [ ] Developer dataset implemented
+- [x] React 19 and Vite initialized
+- [x] Project rules documented
+- [x] Task decomposition completed
+- [x] Developer dataset implemented
 - [ ] SkillBadge implemented
 - [ ] DeveloperCard implemented
 - [ ] Metrics and skills rendered
