@@ -131,6 +131,13 @@ Acceptance Criteria:
 - Component has no internal mutable state.
 - Default props use JavaScript parameter defaults.
 
+Verification:
+- SkillBadge renders name and tier correctly.
+- Default parameters work.
+- Stable keys are provided by the parent list.
+- No React console warnings.
+- npm run lint: PASS.
+- npm run build: PASS.
 Commit: `feat(ex1): implement reusable SkillBadge component`
 
 #### EX1-T06 – Implement DeveloperCard Structure
@@ -224,7 +231,7 @@ For each implementation task:
 - [x] Project rules documented
 - [x] Task decomposition completed
 - [x] Developer dataset implemented
-- [ ] SkillBadge implemented
+- [x] SkillBadge implemented
 - [ ] DeveloperCard implemented
 - [ ] Metrics and skills rendered
 - [ ] Responsive CSS Modules implemented
