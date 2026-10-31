@@ -1,5 +1,5 @@
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { PUBG_VN_SQUADS } from "../data/pubgTelemetry.js";
 import { fetchKraftonTelemetry } from "../services/pubgTelemetry.js";
 
@@ -10,50 +10,90 @@ const REQUEST_STATUS = {
   ERROR: "ERROR",
 };
 
-export function PubgMatchTelemetry() {
+export function PubgMatchTelemetry({ squadId = "te" }) {
   const selectorId = useId();
 
-  const [selectedSquad, setSelectedSquad] = useState("ces");
-  const [status, setStatus] = useState(REQUEST_STATUS.IDLE);
-  const [telemetry, setTelemetry] = useState(null);
-  const [error, setError] = useState("");
+  const [selectedSquad, setSelectedSquad] = useState(squadId);
+  const [retryTick, setRetryTick] = useState(0);
 
-  // Prevent older requests from updating the current UI.
-  const requestIdRef = useRef(0);
+  const [view, setView] = useState({
+    status: REQUEST_STATUS.IDLE,
+    data: null,
+    error: null,
+  });
 
-  async function handleConnect() {
-    const requestId = ++requestIdRef.current;
+  useEffect(() => {
+    const controller = new AbortController();
 
-    setStatus(REQUEST_STATUS.LOADING);
-    setTelemetry(null);
-    setError("");
-
-    try {
-      const result = await fetchKraftonTelemetry(selectedSquad);
-
-      if (requestId !== requestIdRef.current) {
-        return;
+    // Start a new request for the selected squad.
+    // Defer the state update to avoid a synchronous
+    // setState-in-effect lint warning.
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) {
+        setView({
+          status: REQUEST_STATUS.LOADING,
+          data: null,
+          error: null,
+        });
       }
+    });
 
-      setTelemetry(result);
-      setStatus(REQUEST_STATUS.SUCCESS);
-    } catch (requestError) {
-      if (requestId !== requestIdRef.current) {
-        return;
-      }
+    fetchKraftonTelemetry(selectedSquad, {
+      signal: controller.signal,
+    })
+      .then((payload) => {
+        if (controller.signal.aborted) return;
 
-      setError(requestError.message);
-      setStatus(REQUEST_STATUS.ERROR);
-    }
-  }
+        setView({
+          status: REQUEST_STATUS.SUCCESS,
+          data: payload,
+          error: null,
+        });
+      })
+      .catch((error) => {
+        // Aborted requests are not network failures.
+        if (
+          controller.signal.aborted ||
+          error.name === "AbortError"
+        ) {
+          return;
+        }
+
+        setView({
+          status: REQUEST_STATUS.ERROR,
+          data: null,
+          error: error.message,
+        });
+      });
+
+    // Cleanup runs before the next effect
+    // and when the component unmounts.
+    return () => {
+      controller.abort();
+    };
+  }, [selectedSquad, retryTick]);
 
   function handleSquadChange(event) {
-    requestIdRef.current += 1;
+    const nextSquad = event.target.value;
 
-    setSelectedSquad(event.target.value);
-    setStatus(REQUEST_STATUS.IDLE);
-    setTelemetry(null);
-    setError("");
+    setSelectedSquad(nextSquad);
+
+    // Immediately hide telemetry from the old squad.
+    setView({
+      status: REQUEST_STATUS.LOADING,
+      data: null,
+      error: null,
+    });
+  }
+
+  function handleRetry() {
+    setView({
+      status: REQUEST_STATUS.LOADING,
+      data: null,
+      error: null,
+    });
+
+    setRetryTick((previous) => previous + 1);
   }
 
   return (
@@ -61,8 +101,8 @@ export function PubgMatchTelemetry() {
       <header>
         <h2>KRAFTON PVS Live Telemetry</h2>
         <p>
-          Monitor Vietnamese PUBG squads through a simulated
-          satellite connection.
+          Monitor Vietnamese PUBG squads through a
+          simulated satellite connection.
         </p>
       </header>
 
@@ -82,61 +122,58 @@ export function PubgMatchTelemetry() {
             </option>
           ))}
         </select>
-
-        <button
-          type="button"
-          onClick={handleConnect}
-          disabled={status === REQUEST_STATUS.LOADING}
-        >
-          Connect Satellite
-        </button>
       </div>
 
-      {status === REQUEST_STATUS.IDLE && (
-        <p>
-          Select a squad and connect to retrieve telemetry.
-        </p>
+      {view.status === REQUEST_STATUS.IDLE && (
+        <p>Waiting for satellite connection...</p>
       )}
 
-      {status === REQUEST_STATUS.LOADING && (
-        <section aria-label="Loading telemetry">
-          <p>Connecting to satellite...</p>
+      {view.status === REQUEST_STATUS.LOADING && (
+        <section
+          aria-busy="true"
+          aria-label="Loading PUBG telemetry"
+        >
+          <p>Syncing KRAFTON Radar...</p>
         </section>
       )}
 
-      {status === REQUEST_STATUS.SUCCESS && telemetry && (
-        <article>
-          <h3>{telemetry.name}</h3>
+      {view.status === REQUEST_STATUS.SUCCESS &&
+        view.data && (
+          <article aria-live="polite">
+            <h3>{view.data.name}</h3>
 
-          <dl>
-            <dt>Map</dt>
-            <dd>{telemetry.map}</dd>
+            <dl>
+              <dt>Map</dt>
+              <dd>{view.data.map}</dd>
 
-            <dt>Phase</dt>
-            <dd>{telemetry.phase}</dd>
+              <dt>Phase</dt>
+              <dd>{view.data.phase}</dd>
 
-            <dt>Players Alive</dt>
-            <dd>{telemetry.alive}</dd>
+              <dt>Players Alive</dt>
+              <dd>{view.data.alive}</dd>
 
-            <dt>Kills</dt>
-            <dd>{telemetry.kills}</dd>
+              <dt>Kills</dt>
+              <dd>{view.data.kills}</dd>
 
-            <dt>WWCD Probability</dt>
-            <dd>{telemetry.wwcdProb}</dd>
+              <dt>WWCD Probability</dt>
+              <dd>{view.data.wwcdProb}</dd>
 
-            <dt>Status</dt>
-            <dd>{telemetry.status}</dd>
-          </dl>
-        </article>
-      )}
+              <dt>Status</dt>
+              <dd>{view.data.status}</dd>
+            </dl>
+          </article>
+        )}
 
-      {status === REQUEST_STATUS.ERROR && (
+      {view.status === REQUEST_STATUS.ERROR && (
         <section role="alert">
-          <h3>Satellite Connection Failed</h3>
-          <p>{error}</p>
+          <h3>Blue-Zone Link Lost</h3>
+          <p>{view.error}</p>
 
-          <button type="button" onClick={handleConnect}>
-            Reconnect Satellite
+          <button
+            type="button"
+            onClick={handleRetry}
+          >
+            Reconnect Satellite (Retry)
           </button>
         </section>
       )}
