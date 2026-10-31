@@ -89,21 +89,33 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
   }
 
   return (
-    <section aria-label="PUBG Live Telemetry">
-      <header>
+    <section
+      className={styles.telemetry}
+      aria-label="PUBG Live Telemetry"
+    >
+      <header className={styles.header}>
+        <p className={styles.eyebrow}>
+          PVS / LIVE TELEMETRY
+        </p>
+
         <h2>KRAFTON PVS Live Telemetry</h2>
-        <p>
+
+        <p className={styles.description}>
           Monitor Vietnamese PUBG squads through a
           simulated satellite connection.
         </p>
       </header>
 
-      <div>
-        <label htmlFor={selectorId}>
-          Select PUBG Squad:
+      <div className={styles.controls}>
+        <label
+          className={styles.selectorLabel}
+          htmlFor={selectorId}
+        >
+          Select PUBG Squad
         </label>
 
         <select
+          className={styles.squadSelect}
           id={selectorId}
           value={selectedSquad}
           onChange={handleSquadChange}
@@ -117,7 +129,9 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
       </div>
 
       {view.status === REQUEST_STATUS.IDLE && (
-        <p>Waiting for satellite connection...</p>
+        <p className={styles.idleMessage}>
+          Waiting for satellite connection...
+        </p>
       )}
 
       {view.status === REQUEST_STATUS.LOADING && (
@@ -140,28 +154,55 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
 
       {view.status === REQUEST_STATUS.SUCCESS &&
         view.data && (
-          <article aria-live="polite">
-            <h3>{view.data.name}</h3>
+          <article
+            className={styles.dashboard}
+            aria-live="polite"
+          >
+            <header className={styles.dashboardHeader}>
+              <div>
+                <p className={styles.eyebrow}>
+                  SQUAD INTELLIGENCE
+                </p>
 
-            <dl>
-              <dt>Map</dt>
-              <dd>{view.data.map}</dd>
+                <h3 className={styles.squadName}>
+                  {view.data.name}
+                </h3>
 
-              <dt>Phase</dt>
-              <dd>{view.data.phase}</dd>
+                <p className={styles.mapInfo}>
+                  {view.data.map} · {view.data.phase}
+                </p>
+              </div>
 
-              <dt>Players Alive</dt>
-              <dd>{view.data.alive}</dd>
+              <span className={styles.connectionBadge}>
+                LINK ACTIVE
+              </span>
+            </header>
 
-              <dt>Kills</dt>
-              <dd>{view.data.kills}</dd>
+            <dl className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <dt>KILLS</dt>
+                <dd>{view.data.kills}</dd>
+              </div>
 
-              <dt>WWCD Probability</dt>
-              <dd>{view.data.wwcdProb}</dd>
+              <div className={styles.statCard}>
+                <dt>ALIVE</dt>
+                <dd>{view.data.alive}</dd>
+              </div>
 
-              <dt>Status</dt>
-              <dd>{view.data.status}</dd>
+              <div className={styles.statCard}>
+                <dt>WWCD</dt>
+                <dd>{view.data.wwcdProb}</dd>
+              </div>
             </dl>
+
+            <section
+              className={styles.tacticalPanel}
+              aria-label="Tactical status"
+            >
+              <h4>TACTICAL STATUS</h4>
+
+              <p>{view.data.status}</p>
+            </section>
           </article>
         )}
 
