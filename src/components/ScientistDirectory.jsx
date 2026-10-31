@@ -3,7 +3,8 @@ import { useState } from "react";
 import { SMART_PEOPLE } from "../data/scientists";
 
 export function ScientistDirectory() {
-  const [people] = useState(SMART_PEOPLE);
+  // Source of truth: original scientist list
+  const [people, setPeople] = useState(SMART_PEOPLE);
 
   // Independent input states
   const [query, setQuery] = useState("");
@@ -37,6 +38,13 @@ export function ScientistDirectory() {
           return b.iq - a.iq;
       }
     });
+
+  // Delete a scientist by stable ID
+  function handleDelete(id) {
+    setPeople((previousPeople) =>
+      previousPeople.filter((person) => person.id !== id)
+    );
+  }
 
   return (
     <section aria-label="Pioneer Directory">
@@ -115,13 +123,23 @@ export function ScientistDirectory() {
         </select>
       </div>
 
-      {/* Filtered and sorted scientist list */}
+      {/* Scientist list */}
       <ul>
         {visiblePeople.map((person) => (
           <li key={person.id}>
-            <strong>{person.name}</strong>
-            {" — "}IQ: {person.iq}
-            {" — "}Age: {person.age}
+            <span>
+              <strong>{person.name}</strong>
+              {" — "}IQ: {person.iq}
+              {" — "}Age: {person.age}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => handleDelete(person.id)}
+              aria-label={`Delete ${person.name}`}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
