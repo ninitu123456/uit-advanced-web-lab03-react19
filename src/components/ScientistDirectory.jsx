@@ -46,11 +46,29 @@ export function ScientistDirectory() {
     );
   }
 
+  
+  // Restore original dataset and reset all controls
+  function handleReset() {
+    setPeople([...SMART_PEOPLE]);
+    setQuery("");
+    setMinIq(0);
+    setSortBy("iq-desc");
+  }
+
+
   return (
     <section aria-label="Pioneer Directory">
       <h2>Scientist & Pioneer Directory</h2>
 
       <p>Explore famous scientists and pioneers.</p>
+      
+    <button
+        type="button"
+        onClick={handleReset}
+        aria-label="Reset scientist directory"
+        >
+        Reset Directory
+    </button>
 
       {/* Search by name */}
       <div>
