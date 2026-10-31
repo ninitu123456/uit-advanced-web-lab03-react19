@@ -1,0 +1,167 @@
+
+/* Exercise 3 - Blue-Zone Loading & Error UI */
+
+.loadingPanel {
+  width: 100%;
+  min-height: 220px;
+  box-sizing: border-box;
+  padding: 24px;
+  margin-top: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #0b1930,
+    #15345c,
+    #10203a
+  );
+
+  border: 1px solid #3b82f6;
+  border-radius: 16px;
+  color: #dbeafe;
+}
+
+.radar {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border: 2px solid #60a5fa;
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      transparent 49%,
+      #60a5fa55 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 49%,
+      #60a5fa55 50%,
+      transparent 51%
+    );
+
+  animation: radarPulse 1.5s ease-in-out infinite;
+}
+
+.radar::before,
+.radar::after {
+  content: "";
+  position: absolute;
+  border: 1px solid #60a5fa80;
+  border-radius: 50%;
+}
+
+.radar::before {
+  inset: 18px;
+}
+
+.radar::after {
+  inset: 36px;
+}
+
+.loadingText {
+  margin: 0;
+  color: #bfdbfe;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.errorPanel {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 20px;
+  padding: 24px;
+
+  background: #fff1f2;
+  color: #881337;
+
+  border: 1px solid #fda4af;
+  border-left: 5px solid #e11d48;
+  border-radius: 12px;
+}
+
+.errorTitle {
+  margin: 0 0 10px;
+  color: #9f1239;
+  font-size: 1.15rem;
+}
+
+.errorMessage {
+  margin: 0 0 18px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.retryButton {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+
+  background: #be123c;
+  color: #ffffff;
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.retryButton:hover {
+  background: #9f1239;
+  transform: translateY(-1px);
+}
+
+.retryButton:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+@keyframes radarPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+    box-shadow: 0 0 8px #3b82f655;
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 28px #60a5fa88;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar {
+    animation: none;
+  }
+
+  .retryButton {
+    transition: none;
+  }
+
+  .retryButton:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .loadingPanel,
+  .errorPanel {
+    padding: 18px;
+  }
+
+  .retryButton {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@
 import { useEffect, useId, useState } from "react";
 import { PUBG_VN_SQUADS } from "../data/pubgTelemetry.js";
 import { fetchKraftonTelemetry } from "../services/pubgTelemetry.js";
+import styles from "./PubgMatchTelemetry.module.css";
 
 const REQUEST_STATUS = {
   IDLE: "IDLE",
@@ -25,9 +26,6 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
   useEffect(() => {
     const controller = new AbortController();
 
-    // Start a new request for the selected squad.
-    // Defer the state update to avoid a synchronous
-    // setState-in-effect lint warning.
     queueMicrotask(() => {
       if (!controller.signal.aborted) {
         setView({
@@ -51,7 +49,6 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
         });
       })
       .catch((error) => {
-        // Aborted requests are not network failures.
         if (
           controller.signal.aborted ||
           error.name === "AbortError"
@@ -66,19 +63,14 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
         });
       });
 
-    // Cleanup runs before the next effect
-    // and when the component unmounts.
     return () => {
       controller.abort();
     };
   }, [selectedSquad, retryTick]);
 
   function handleSquadChange(event) {
-    const nextSquad = event.target.value;
+    setSelectedSquad(event.target.value);
 
-    setSelectedSquad(nextSquad);
-
-    // Immediately hide telemetry from the old squad.
     setView({
       status: REQUEST_STATUS.LOADING,
       data: null,
@@ -130,10 +122,19 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
 
       {view.status === REQUEST_STATUS.LOADING && (
         <section
+          className={styles.loadingPanel}
           aria-busy="true"
           aria-label="Loading PUBG telemetry"
+          role="status"
         >
-          <p>Syncing KRAFTON Radar...</p>
+          <span
+            className={styles.radar}
+            aria-hidden="true"
+          />
+
+          <p className={styles.loadingText}>
+            Syncing KRAFTON Radar...
+          </p>
         </section>
       )}
 
@@ -165,11 +166,20 @@ export function PubgMatchTelemetry({ squadId = "te" }) {
         )}
 
       {view.status === REQUEST_STATUS.ERROR && (
-        <section role="alert">
-          <h3>Blue-Zone Link Lost</h3>
-          <p>{view.error}</p>
+        <section
+          className={styles.errorPanel}
+          role="alert"
+        >
+          <h3 className={styles.errorTitle}>
+            Blue-Zone Link Lost
+          </h3>
+
+          <p className={styles.errorMessage}>
+            {view.error}
+          </p>
 
           <button
+            className={styles.retryButton}
             type="button"
             onClick={handleRetry}
           >
