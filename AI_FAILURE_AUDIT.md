@@ -403,3 +403,68 @@ No confirmed AI-generated failures were observed.
 **Confirmed AI failures:** Not established.
 
 **Conclusion:** Final verification is required before changing checkpoint statuses to PASS or reporting confirmed AI failures. A passed checkpoint must not be represented as a confirmed failure.
+
+## Exercise 3 — AI Failure Audit
+
+### EX3-AF-01 — Missing ESM File Extension
+
+**AI-generated code:**
+
+```javascript
+import { PUBG_VN_SQUADS } from "../data/pubgTelemetry";
+```
+
+**Observed failure:** Executing the telemetry service with Node.js v24.22.1 produced `ERR_MODULE_NOT_FOUND`.
+
+**Root cause:** Native Node.js ESM resolution requires an explicit file extension for this relative import.
+
+**Manual engineering fix:**
+
+```javascript
+import { PUBG_VN_SQUADS } from "../data/pubgTelemetry.js";
+```
+
+**Verification:** Re-run the Genius Esports telemetry request and confirm the expected result.
+
+**Evidence:** Terminal output showing the original error and successful execution after correction, if retained.
+
+**Fix commit:** Add the actual Git commit hash after checking the repository.
+
+### EX3-AF-02 — ESLint Errors in AI-Generated Test Code
+
+**AI-generated code:**
+
+```javascript
+import test, { mock } from "node:test";
+```
+
+The test helper also referenced `setImmediate` and `clearImmediate` without importing them.
+
+**Observed failure:** ESLint reported three errors:
+
+- `mock` defined but never used.
+- `setImmediate` is not defined.
+- `clearImmediate` is not defined.
+
+**Root cause:** The AI generated an unnecessary import and omitted explicit Node.js timer imports required by the project's ESLint configuration.
+
+**Manual engineering fix:**
+
+```javascript
+import test from "node:test";
+import { setImmediate, clearImmediate } from "node:timers";
+```
+
+**Verification:** Re-run ESLint and the telemetry service unit tests.
+
+**Evidence:** Original ESLint output and successful verification after correction, if retained.
+
+**Fix commit:** Add the actual Git commit hash after checking the repository.
+
+### EX3-AF-03 — Pending Verified Failure
+
+**Status:** Not yet documented.
+
+A third failure must only be added after observing an actual AI-generated defect, reproducing it, identifying its root cause, implementing a correction and verifying the fix.
+
+Do not present a hypothetical failure as an observed defect.

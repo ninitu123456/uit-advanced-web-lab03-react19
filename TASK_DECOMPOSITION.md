@@ -477,3 +477,58 @@ Commit: `docs(ex2): finalize task decomposition and AI audit`
 - [x] At least 10 meaningful Exercise 2 commits created.
 
 Mark each item complete only after verification.
+
+
+## Exercise 3 — KRAFTON PUBG Vietnam Series Live Telemetry
+
+### Objective
+
+Build a fault-tolerant PUBG telemetry interface for three Vietnamese esports squads using React 19, asynchronous JavaScript, AbortController, and accessible UI states.
+
+The application uses simulated telemetry data rather than the real KRAFTON API.
+
+### Task Decomposition
+
+| Task ID | Task | Implementation | Verification |
+|---|---|---|---|
+| EX3-T01 | Define PUBG squad dataset | `src/data/pubgTelemetry.js` | Verify three unique squad IDs and expected fields |
+| EX3-T02 | Implement mock telemetry service | `src/services/pubgTelemetry.js` | Test data retrieval, invalid IDs and simulated packet loss |
+| EX3-T03 | Build telemetry component and state machine | `src/components/PubgMatchTelemetry.jsx` | Verify IDLE, LOADING, SUCCESS and ERROR states |
+| EX3-T04 | Implement request cancellation | `PubgMatchTelemetry.jsx` | Verify AbortController cleanup and stale-response protection |
+| EX3-T05 | Implement loading and error UI | `PubgMatchTelemetry.jsx`, CSS Module | Verify 220px skeleton, accessible alert and Retry |
+| EX3-T06 | Design responsive telemetry dashboard | CSS Module and component JSX | Verify telemetry cards and 375px viewport |
+| EX3-T07 | Add telemetry service unit tests | `tests/pubgTelemetry.test.js` | Run Node.js test runner |
+| EX3-T08 | Add React component tests | `tests/PubgMatchTelemetry.test.jsx`, `vitest.config.js` | Run Vitest component tests |
+| EX3-T09 | Complete engineering documentation | `TASK_DECOMPOSITION.md`, `AI_FAILURE_AUDIT.md` | Review task traceability and recorded failures |
+| EX3-T10 | Collect evidence and perform final QA | `evidence/exercise-03/` | Verify screenshots, test results and Git history |
+
+### Engineering Decisions
+
+**Four-state request model:** IDLE, LOADING, SUCCESS and ERROR represent the lifecycle of telemetry retrieval.
+
+**Cancellation:** Each effect creates an AbortController. Its cleanup aborts obsolete requests when the selected squad changes or the component unmounts.
+
+**Error handling:** AbortError is ignored because intentional cancellation is not a network failure. Packet loss is displayed through an accessible alert with a Retry action.
+
+**Simulated networking:** The service models 1,800 ms latency and 35% packet loss on Erangel and Miramar. Taego is not affected by the simulated packet-loss condition.
+
+**Accessibility:** The interface includes a labelled squad selector, loading status, error alert, keyboard-accessible Retry button and reduced-motion support.
+
+### Commit Traceability
+
+Map the task IDs above to the actual Git commit hashes using `git log --oneline`. Do not insert fabricated commit hashes or claim that a test passed without running it.
+
+### Verification Commands
+
+```powershell
+node --test tests/pubgTelemetry.test.js
+npx vitest run
+npm run lint
+npm run build
+```
+
+Record the actual results and any remaining limitations after executing these commands.
+
+### Scope Protection
+
+Exercise 3 must not introduce regressions into the DeveloperCard component from Exercise 1 or the ScientistDirectory component from Exercise 2.
