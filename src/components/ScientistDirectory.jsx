@@ -1,22 +1,19 @@
 
 import { useId, useState } from "react";
 import { SMART_PEOPLE } from "../data/scientists";
+import styles from "./ScientistDirectory.module.css";
 
 export function ScientistDirectory() {
-  // Unique IDs for accessible form controls
   const searchId = useId();
   const minIqId = useId();
   const sortId = useId();
 
-  // Source of truth
   const [people, setPeople] = useState(SMART_PEOPLE);
-
-  // Independent UI states
   const [query, setQuery] = useState("");
   const [minIq, setMinIq] = useState(0);
   const [sortBy, setSortBy] = useState("iq-desc");
 
-  // Derived state: filtering and immutable sorting
+  // Derived state: filter and sort without mutation
   const visiblePeople = people
     .filter((person) => {
       const matchesName = person.name
@@ -44,14 +41,12 @@ export function ScientistDirectory() {
       }
     });
 
-  // Immutable deletion using stable ID
   function handleDelete(id) {
     setPeople((previousPeople) =>
       previousPeople.filter((person) => person.id !== id)
     );
   }
 
-  // Restore original data and default controls
   function handleReset() {
     setPeople([...SMART_PEOPLE]);
     setQuery("");
@@ -60,22 +55,32 @@ export function ScientistDirectory() {
   }
 
   return (
-    <section aria-label="Pioneer Directory">
-      <header>
-        <h2>Scientist & Pioneer Directory</h2>
-        <p>
+    <section
+      className={styles.directory}
+      aria-label="Pioneer Directory"
+    >
+      <header className={styles.header}>
+        <h2 className={styles.title}>
+          Scientist & Pioneer Directory
+        </h2>
+
+        <p className={styles.description}>
           Explore, filter, sort and manage famous pioneers.
         </p>
       </header>
 
-      {/* Search and filtering controls */}
-      <div>
-        <div>
-          <label htmlFor={searchId}>
+      <div className={styles.controls}>
+        {/* Search by name */}
+        <div className={styles.field}>
+          <label
+            className={styles.label}
+            htmlFor={searchId}
+          >
             Search by name:
           </label>
 
           <input
+            className={styles.input}
             id={searchId}
             type="search"
             placeholder="Enter scientist name..."
@@ -86,12 +91,17 @@ export function ScientistDirectory() {
           />
         </div>
 
-        <div>
-          <label htmlFor={minIqId}>
+        {/* Minimum IQ filter */}
+        <div className={styles.field}>
+          <label
+            className={styles.label}
+            htmlFor={minIqId}
+          >
             Minimum IQ:
           </label>
 
           <input
+            className={styles.input}
             id={minIqId}
             type="number"
             min="0"
@@ -108,12 +118,17 @@ export function ScientistDirectory() {
           />
         </div>
 
-        <div>
-          <label htmlFor={sortId}>
+        {/* Sorting */}
+        <div className={styles.field}>
+          <label
+            className={styles.label}
+            htmlFor={sortId}
+          >
             Sort by:
           </label>
 
           <select
+            className={styles.select}
             id={sortId}
             value={sortBy}
             onChange={(event) =>
@@ -138,7 +153,9 @@ export function ScientistDirectory() {
           </select>
         </div>
 
+        {/* Reset */}
         <button
+          className={styles.resetButton}
           type="button"
           onClick={handleReset}
         >
@@ -146,25 +163,41 @@ export function ScientistDirectory() {
         </button>
       </div>
 
-      {/* Accessible live result counter */}
-      <output role="status" aria-live="polite">
-        Found {visiblePeople.length} pioneers
-      </output>
+      {/* Accessible result counter */}
+      <div className={styles.results}>
+        <output
+          className={styles.counter}
+          role="status"
+          aria-live="polite"
+        >
+          Found {visiblePeople.length} pioneers
+        </output>
+      </div>
 
       {/* Empty state or scientist list */}
       {visiblePeople.length === 0 ? (
-        <p>No matching scientists found.</p>
+        <p className={styles.emptyState}>
+          No matching scientists found.
+        </p>
       ) : (
-        <ul>
+        <ul className={styles.list}>
           {visiblePeople.map((person) => (
-            <li key={person.id}>
-              <span>
-                <strong>{person.name}</strong>
-                {" — "}IQ: {person.iq}
-                {" — "}Age: {person.age}
-              </span>
+            <li
+              key={person.id}
+              className={styles.listItem}
+            >
+              <div className={styles.personInfo}>
+                <strong className={styles.personName}>
+                  {person.name}
+                </strong>
+
+                <span className={styles.personDetails}>
+                  IQ: {person.iq} | Age: {person.age}
+                </span>
+              </div>
 
               <button
+                className={styles.deleteButton}
                 type="button"
                 onClick={() =>
                   handleDelete(person.id)
