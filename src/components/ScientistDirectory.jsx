@@ -6,15 +6,20 @@ export function ScientistDirectory() {
   // Original scientist data
   const [people] = useState(SMART_PEOPLE);
 
-  // Search input state
+  // Independent input states
   const [query, setQuery] = useState("");
+  const [minIq, setMinIq] = useState(0);
 
-  // Derived state: filter scientists during render
-  const visiblePeople = people.filter((person) =>
-    person.name
+  // Derived state: search + minimum IQ filtering
+  const visiblePeople = people.filter((person) => {
+    const matchesName = person.name
       .toLowerCase()
-      .includes(query.trim().toLowerCase())
-  );
+      .includes(query.trim().toLowerCase());
+
+    const matchesIq = person.iq >= minIq;
+
+    return matchesName && matchesIq;
+  });
 
   return (
     <section aria-label="Pioneer Directory">
@@ -22,7 +27,7 @@ export function ScientistDirectory() {
 
       <p>Explore famous scientists and pioneers.</p>
 
-      {/* Search input */}
+      {/* Search by name */}
       <div>
         <label htmlFor="scientist-search">
           Search by name:
@@ -39,7 +44,30 @@ export function ScientistDirectory() {
         />
       </div>
 
-      {/* Scientist list */}
+      {/* Minimum IQ filter */}
+      <div>
+        <label htmlFor="scientist-min-iq">
+          Minimum IQ:
+        </label>
+
+        <input
+          id="scientist-min-iq"
+          type="number"
+          min="0"
+          value={minIq}
+          onChange={(event) => {
+            const value = event.target.valueAsNumber;
+
+            setMinIq(
+              Number.isNaN(value)
+                ? 0
+                : Math.max(0, value)
+            );
+          }}
+        />
+      </div>
+
+      {/* Filtered scientist list */}
       <ul>
         {visiblePeople.map((person) => (
           <li key={person.id}>
